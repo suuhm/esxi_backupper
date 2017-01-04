@@ -75,7 +75,7 @@ Usage() {
 # Process command-line arguments of --help --on and --off and --compress
 # --help     ==> Print the command-line usage and exit
 # --dobackup ==> Backup Powered On  VMs
-# --list     ==> Backup Powered Off VMs
+# --list     ==> List als ID's of VMs
 # --zip      ==> Gzip up the .vmdk files
 # --all      ==> Alles!
 CommandLine() {
@@ -138,11 +138,11 @@ MountNFS() {
 
 # If VM is ONline than exit or Take Snapshot ;)
 PoweredOn() {
-	if ( vim-cmd vmsvc/power.getstate $VM | fgrep -q 'Powered on' ); then
-   # It is powered on. Do we need to back it up?
-   echo VM ist noch an Bitte vorhher ausschalten. Da es sonst zu Problemen kommen kann | tee -a $LOG
-   echo 
-   continue
+   if ( vim-cmd vmsvc/power.getstate $VM | fgrep -q 'Powered on' ); then
+      # It is powered on. Do we need to back it up?
+      echo VM ist noch an Bitte vorhher ausschalten. Da es sonst zu Problemen kommen kann | tee -a $LOG
+      echo 
+      continue
    fi
 }
 
@@ -286,6 +286,7 @@ echo '...'
 sleep 1
 echo Vorgang hat $(let eH=$(date +%H)-$sH;let eM=$(date +%M)-$sM;echo $eH:$eM) Minuten gedauert! | tee -a $LOG
 # SENDING MAIL - EXPERIMENTAL
-#cat $LOG | mail -s 'DCron ESXi' suhm@suuhm.info
-#/usr/bin/SimpleMail/smail –a mysmpt.bar.com –s "Hello" –m "Hello world" suhm@suuhm.info
+_date = $(date +%Y-%m-%d')
+cat $LOG | mail -s 'DCron ESXi' suhm@suuhm.info
+/usr/bin/SimpleMail/smail –a mysmpt.bar.com –s "ESXi Report - $_date" –m "ESXi - Backup NFS Report $LOG <end>" suhm@suuhm.info
 
